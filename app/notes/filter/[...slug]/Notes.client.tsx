@@ -6,11 +6,11 @@ import SearchBox from "@/components/SearchBox/SearchBox";
 import { fetchNotes } from "@/lib/api";
 import { useQuery } from "@tanstack/react-query";
 import ErrorMessage from "@/components/ErrorMessage/ErrorMessage";
-import { useState } from "react";
 import NoteList from "@/components/NoteList/NoteList";
 import Modal from "@/components/Modal/Modal";
 import NoteForm from "@/components/NoteForm/NoteForm";
 import { useDebouncedCallback } from "use-debounce";
+import { useNotesStore } from "@/store/noteStore";
 import css from "./Notes.module.css";
 
 interface NotesClientProps {
@@ -18,14 +18,18 @@ interface NotesClientProps {
 }
 
 function NotesClient({ tag }: NotesClientProps) {
-  const [query, setQuery] = useState<string>("");
-  const [searchValue, setSearchValue] = useState<string>("");
-  const [page, setPage] = useState<number>(1);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const query = useNotesStore((state) => state.query);
+  const searchValue = useNotesStore((state) => state.searchValue);
+  const page = useNotesStore((state) => state.page);
+  const isModalOpen = useNotesStore((state) => state.isModalOpen);
+  const setQuery = useNotesStore((state) => state.setQuery);
+  const setSearchValue = useNotesStore((state) => state.setSearchValue);
+  const setPage = useNotesStore((state) => state.setPage);
+  const openModal = useNotesStore((state) => state.openModal);
+  const closeModal = useNotesStore((state) => state.closeModal);
 
   const updateQuery = useDebouncedCallback((newQuery: string) => {
     setQuery(newQuery);
-    setPage(1);
   }, 300);
 
   const { data, isLoading, isError } = useQuery({
@@ -40,14 +44,6 @@ function NotesClient({ tag }: NotesClientProps) {
     updateQuery(newQuery);
   }
 
-  function openForm() {
-    setIsModalOpen(true);
-  }
-
-  function closeForm() {
-    setIsModalOpen(false);
-  }
-
   return (
     <div className={css.app}>
       <header className={css.toolbar}>
@@ -60,7 +56,7 @@ function NotesClient({ tag }: NotesClientProps) {
           />
         )}
 
-        <button className={css.button} onClick={openForm}>
+        <button className={css.button} onClick={openModal}>
           Create note +
         </button>
       </header>
@@ -68,8 +64,8 @@ function NotesClient({ tag }: NotesClientProps) {
       {isError && <ErrorMessage />}
       {data && data.notes.length > 0 && <NoteList notes={data.notes} />}
       {isModalOpen && (
-        <Modal onClose={closeForm}>
-          <NoteForm closeForm={closeForm} />
+        <Modal onClose={closeModal}>
+          <NoteForm closeForm={closeModal} />
         </Modal>
       )}
     </div>
