@@ -11,13 +11,7 @@ const initialDraft: NoteCreate = {
 };
 
 interface NotesState {
-  query: string;
-  searchValue: string;
-  page: number;
   draft: NoteCreate;
-  setSearchValue: (searchValue: string) => void;
-  setQuery: (query: string) => void;
-  setPage: (page: number) => void;
   setDraft: (note: Partial<NoteCreate>) => void;
   clearDraft: () => void;
 }
@@ -25,13 +19,7 @@ interface NotesState {
 export const useNotesStore = create<NotesState>()(
   persist(
     (set) => ({
-      query: "",
-      searchValue: "",
-      page: 1,
       draft: initialDraft,
-      setSearchValue: (searchValue) => set({ searchValue }),
-      setQuery: (query) => set({ query, page: 1 }),
-      setPage: (page) => set({ page }),
       setDraft: (note) =>
         set((state) => ({ draft: { ...state.draft, ...note } })),
       clearDraft: () => set({ draft: initialDraft }),

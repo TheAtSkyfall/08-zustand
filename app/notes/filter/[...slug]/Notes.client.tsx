@@ -8,8 +8,8 @@ import { useQuery } from "@tanstack/react-query";
 import ErrorMessage from "@/components/ErrorMessage/ErrorMessage";
 import NoteList from "@/components/NoteList/NoteList";
 import { useDebouncedCallback } from "use-debounce";
-import { useNotesStore } from "@/lib/store/noteStore";
 import Link from "next/link";
+import { useState } from "react";
 import css from "./Notes.module.css";
 
 interface NotesClientProps {
@@ -17,15 +17,13 @@ interface NotesClientProps {
 }
 
 function NotesClient({ tag }: NotesClientProps) {
-  const query = useNotesStore((state) => state.query);
-  const searchValue = useNotesStore((state) => state.searchValue);
-  const page = useNotesStore((state) => state.page);
-  const setQuery = useNotesStore((state) => state.setQuery);
-  const setSearchValue = useNotesStore((state) => state.setSearchValue);
-  const setPage = useNotesStore((state) => state.setPage);
+  const [query, setQuery] = useState("");
+  const [searchValue, setSearchValue] = useState("");
+  const [page, setPage] = useState(1);
 
   const updateQuery = useDebouncedCallback((newQuery: string) => {
     setQuery(newQuery);
+    setPage(1);
   }, 300);
 
   const { data, isLoading, isError } = useQuery({
